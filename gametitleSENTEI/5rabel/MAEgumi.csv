@@ -1,0 +1,7 @@
+game_title,estimated_emotional_label,similarity_設定状況の魅力,similarity_ゲーム本来の楽しさ,similarity_感覚運動的興奮,similarity_和みと癒し,similarity_難解・頭脳型
+apexreview,和みと癒し,0.87,0.82,0.77,0.9,0.85
+genisn,ゲーム本来の楽しさ,0.96,0.98,0.91,0.97,0.91
+minecraft,ゲーム本来の楽しさ,0.96,0.98,0.92,0.96,0.9
+OV2,ゲーム本来の楽しさ,0.96,0.98,0.92,0.97,0.89
+supura,設定状況の魅力,0.94,0.91,0.87,0.94,0.89
+valo,ゲーム本来の楽しさ,0.96,0.97,0.9,0.97,0.92
