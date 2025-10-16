@@ -3,6 +3,7 @@ import requests
 import pandas as pd
 
 def get_steam_reviews(app_id, review_type='all', num_reviews=10, language='all', api_key=None):
+    """Steamレビューを取得する"""
     base_url = f'http://store.steampowered.com/appreviews/{app_id}?json=1'
     params = {
         'filter': review_type,
@@ -11,38 +12,31 @@ def get_steam_reviews(app_id, review_type='all', num_reviews=10, language='all',
     }
     if api_key:
         params['key'] = api_key
+    
     response = requests.get(base_url, params=params)
     if response.status_code == 200:
         return response.json()
     raise RuntimeError(f'レビューの取得に失敗しました: {response.status_code}, {response.text}')
 
 def export_reviews_to_csv(app_id, output_csv_path, review_type='all', num_reviews=10, language='all', api_key=None):
-    """Steamレビューを取得してCSVに保存するユーティリティ関数。
-
-    Parameters
-    ----------
-    app_id : int | str
-        SteamアプリID。
-    output_csv_path : str
-        出力するCSVの絶対パス。
-    review_type : str
-        フィルタ（'all'|'positive'|'negative' など）。
-    num_reviews : int
-        取得件数。
-    language : str
-        言語（'all'|'japanese' など）。
-    api_key : str | None
-        必要に応じてSteam APIキー。
-
-    Returns
-    -------
-    str
-        保存されたCSVの絶対パス。
+    """Steamレビューを取得してCSVに保存する
+    
+    Args:
+        app_id: SteamアプリID
+        output_csv_path: 出力CSVの絶対パス
+        review_type: フィルタ（'all'|'positive'|'negative'）
+        num_reviews: 取得件数
+        language: 言語（'all'|'japanese'）
+        api_key: Steam APIキー（オプション）
+    
+    Returns:
+        保存されたCSVの絶対パス
     """
-    reviews = get_steam_reviews(app_id, review_type=review_type, num_reviews=num_reviews, language=language, api_key=api_key)
-    # 'reviews' キー配下にレビューリストがあることを想定
+    reviews = get_steam_reviews(app_id, review_type, num_reviews, language, api_key)
+    
     if 'reviews' not in reviews:
         raise ValueError("APIレスポンスに 'reviews' キーが見つかりませんでした")
+    
     df = pd.DataFrame(reviews['reviews'])
     os.makedirs(os.path.dirname(output_csv_path), exist_ok=True)
     df.to_csv(output_csv_path, index=False)

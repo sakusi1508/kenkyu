@@ -25,7 +25,12 @@ ratings = {
 }
 
 def preprocess_text_japanese(text):
-    mecab = MeCab.Tagger("-Owakati")  # 分かち書きオプション
+    # MeCabの設定ファイルパスを指定
+    mecabrc_path = os.environ.get('MECABRC', '/opt/homebrew/etc/mecabrc')
+    if os.path.exists(mecabrc_path):
+        mecab = MeCab.Tagger(f"-r {mecabrc_path} -Owakati")
+    else:
+        mecab = MeCab.Tagger("-Owakati")  # デフォルト設定
     tokens = mecab.parse(text).strip().split()
     stopwords = set([
         "の", "に", "は", "を", "た", "が", "で", "て", "と", "し", "れ", "さ", "も", "な", "だ", "する", "ある", "いる", "こと", "これ", "それ", "あれ", "どれ", "ため", "ここ", "そこ", "あそこ", "もの", "よ", "う"
@@ -33,23 +38,16 @@ def preprocess_text_japanese(text):
     return [word for word in tokens if word not in stopwords]
 
 def score_reviews_csv(input_csv_path, output_csv_path, model_path, threshold=0.5):
-    """レビューCSVを読み込み、関連キーワードとの類似度スコアをCSV出力する。
-
-    Parameters
-    ----------
-    input_csv_path : str
-        入力レビューCSVの絶対パス（'review'列が必要）。
-    output_csv_path : str
-        出力スコアCSVの絶対パス。
-    model_path : str
-        日本語Word2Vecモデルのパス（.bin）。
-    threshold : float
-        類似度の閾値。
-
-    Returns
-    -------
-    str
-        保存されたCSVの絶対パス。
+    """レビューCSVから14軸の評価スコアを生成する
+    
+    Args:
+        input_csv_path: 入力レビューCSVの絶対パス（'review'列が必要）
+        output_csv_path: 出力スコアCSVの絶対パス
+        model_path: 日本語Word2Vecモデルのパス
+        threshold: 類似度の閾値
+    
+    Returns:
+        保存されたCSVの絶対パス
     """
     df_reviews = pd.read_csv(input_csv_path)
     if 'review' not in df_reviews.columns:
