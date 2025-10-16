@@ -1,0 +1,54 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Step 1 - レビューCSV生成</title>
+    <style>
+      body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji"; margin: 32px; }
+      form { max-width: 560px; }
+      label { display: block; margin-top: 12px; }
+      input, select { width: 100%; padding: 8px; margin-top: 4px; }
+      button { margin-top: 16px; padding: 10px 16px; }
+      .msg { color: #b00; margin-bottom: 12px; }
+      a { text-decoration: none; }
+    </style>
+  </head>
+  <body>
+    <h1>Step 1 - レビューCSV生成</h1>
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+        <div class="msg">{{ messages[-1] }}</div>
+      {% endif %}
+    {% endwith %}
+    <form method="post">
+      <label>Steam アプリID
+        <input name="app_id" placeholder="例: 2357570" required />
+      </label>
+      <label>出力CSV名（拡張子は自動で .csv）
+        <input name="output_name" placeholder="例: my_reviews" required />
+      </label>
+      <label>レビュータイプ
+        <select name="review_type">
+          <option value="all">all</option>
+          <option value="positive" selected>positive</option>
+          <option value="negative">negative</option>
+        </select>
+      </label>
+      <label>言語
+        <select name="language">
+          <option value="all">all</option>
+          <option value="japanese" selected>japanese</option>
+        </select>
+      </label>
+      <label>取得件数
+        <input type="number" name="num_reviews" value="100" min="1" max="1000" />
+      </label>
+      <button type="submit">レビューCSVを作成</button>
+    </form>
+    <p style="margin-top:24px;">
+      <a href="{{ url_for('step2') }}">Step 2 へ（既存CSVを使う）</a>
+    </p>
+  </body>
+  </html>
+
+

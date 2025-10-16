@@ -1,9 +1,11 @@
+import os
 import MeCab #日本語のストップワード削除
 from gensim.models import KeyedVectors #Word2vec処理
 from sklearn.metrics.pairwise import cosine_similarity #コサイン類似度を計算
 import numpy as np
 from collections import Counter #リスト型処理
 import pandas as pd
+
 #日本語の関連キーワード
 ratings = {
     'RPG性': ['クエスト', 'キャラクター', 'ストーリー', 'レベル'],
@@ -21,61 +23,72 @@ ratings = {
     '参加人数の多さ': ['マルチプレイヤー', 'オンライン', '協力', 'チーム'],
     'ハードウェア普及度': ['PC', 'コンソール', 'プラットフォーム', 'ハードウェア']
 }
-#MeCabで日本語テキストを前処理
+
 def preprocess_text_japanese(text):
     mecab = MeCab.Tagger("-Owakati")  # 分かち書きオプション
     tokens = mecab.parse(text).strip().split()
-    #日本語ストップワード（必要に応じて追加）
     stopwords = set([
-    "の", "に", "は", "を", "た", "が", "で", "て", "と", "し", "れ", "さ", "も", "な", "だ", "する", "ある", "いる", "こと", "これ", "それ", "あれ", "どれ", "ため", "ここ", "そこ", "あそこ", "もの", "よ","う"])
-    tokens = [word for word in tokens if word not in stopwords]
-    return tokens
+        "の", "に", "は", "を", "た", "が", "で", "て", "と", "し", "れ", "さ", "も", "な", "だ", "する", "ある", "いる", "こと", "これ", "それ", "あれ", "どれ", "ため", "ここ", "そこ", "あそこ", "もの", "よ", "う"
+    ])
+    return [word for word in tokens if word not in stopwords]
 
-#CSVファイルからレビューを読み込み
-csv_path = "/Users/sakumasin/Documents/vscode/zemi/csv/OV2__3_review.csv"
-df_reviews = pd.read_csv(csv_path)
-review_texts = df_reviews['review'].dropna().tolist()  #'review'列からデータを取得
-'''
-　　∧,,∧ 　　 ∧,,∧　　　∧,,▲
-　 (,,・∀・) 　 ﾐ,,・∀・ﾐ 　 (;;・∀・)
-～(_ｕ,ｕﾉ　＠ﾐ_ｕ,,ｕﾐ　＠(;;;;ｕｕﾉ
-評定したいゲームタイトルのCSVに変更↑
-'''
-#全レビューを前処理して単語リストを作成
-all_words = []
-for text in review_texts:
-    all_words.extend(preprocess_text_japanese(text))
-#全単語をカウント
-word_counts = Counter(all_words)
-print(f"Total unique words: {len(word_counts)}")
-#Word2Vecモデルの読み込み（日本語版）
-model_path = "/Users/sakumasin/Documents/vscode/zemi/models/word2vec/entity_vector/entity_vector.model.bin"  # 日本語Word2Vecモデルのパス
-word2vec = KeyedVectors.load_word2vec_format(model_path, binary=True)
-#評定項目ごとに単語とのコサイン類似度を計算
-scores = {}
-threshold = 0.5  #類似度の閾値
-for rating, keywords in ratings.items():
-    similarities = []
-    for word in word_counts.keys():
-        if word in word2vec:  #単語がWord2Vecモデルに含まれているか確認
-            word_vector = word2vec[word].reshape(1, -1)
-            keyword_vectors = [word2vec[k].reshape(1, -1) for k in keywords if k in word2vec]
-            if keyword_vectors:
-                #各キーワードとの類似度を計算
-                sim_scores = [cosine_similarity(word_vector, kv)[0][0] for kv in keyword_vectors]
-                max_sim = max(sim_scores)  #最大類似度を使用
-                if max_sim >= threshold:  #閾値を超えた場合のみ記録
-                    similarities.append(max_sim)
-    #類似度の平均をスコアとする
-    avg_similarity = np.mean(similarities) if similarities else 0
-    scores[rating] = avg_similarity
-#結果を表示
-print("\nSimilarity Scores:")
-for rating, score in scores.items():
-    print(f"{rating}: {score:.2f}")
-#'scores' 辞書をDataFrameに変換
-output_path = "OV2_scores_japanese.csv"
-df_scores = pd.DataFrame(list(scores.items()), columns=['Rating', 'Score'])
-#CSVファイルとして保存
-df_scores.to_csv(output_path, index=False)
-print(f"Results saved to {output_path}")
+def score_reviews_csv(input_csv_path, output_csv_path, model_path, threshold=0.5):
+    """レビューCSVを読み込み、関連キーワードとの類似度スコアをCSV出力する。
+
+    Parameters
+    ----------
+    input_csv_path : str
+        入力レビューCSVの絶対パス（'review'列が必要）。
+    output_csv_path : str
+        出力スコアCSVの絶対パス。
+    model_path : str
+        日本語Word2Vecモデルのパス（.bin）。
+    threshold : float
+        類似度の閾値。
+
+    Returns
+    -------
+    str
+        保存されたCSVの絶対パス。
+    """
+    df_reviews = pd.read_csv(input_csv_path)
+    if 'review' not in df_reviews.columns:
+        raise ValueError("入力CSVに 'review' 列が見つかりません")
+    review_texts = df_reviews['review'].dropna().tolist()
+
+    all_words = []
+    for text in review_texts:
+        all_words.extend(preprocess_text_japanese(text))
+    word_counts = Counter(all_words)
+
+    word2vec = KeyedVectors.load_word2vec_format(model_path, binary=True)
+
+    scores = {}
+    for rating, keywords in ratings.items():
+        similarities = []
+        for word in word_counts.keys():
+            if word in word2vec:
+                word_vector = word2vec[word].reshape(1, -1)
+                keyword_vectors = [word2vec[k].reshape(1, -1) for k in keywords if k in word2vec]
+                if keyword_vectors:
+                    sim_scores = [cosine_similarity(word_vector, kv)[0][0] for kv in keyword_vectors]
+                    max_sim = max(sim_scores)
+                    if max_sim >= threshold:
+                        similarities.append(max_sim)
+        avg_similarity = np.mean(similarities) if similarities else 0
+        scores[rating] = avg_similarity
+
+    df_scores = pd.DataFrame(list(scores.items()), columns=['Rating', 'Score'])
+    os.makedirs(os.path.dirname(output_csv_path), exist_ok=True)
+    df_scores.to_csv(output_csv_path, index=False)
+    return output_csv_path
+
+if __name__ == '__main__':
+    # 簡易CLI実行例（環境変数で指定）
+    input_csv_path = os.environ.get('INPUT_CSV')
+    output_csv_path = os.environ.get('OUTPUT_CSV', '/tmp/scores.csv')
+    model_path = os.environ.get('MODEL_PATH', '/Users/sakumasin/Documents/vscode/zemi/models/word2vec/entity_vector/entity_vector.model.bin')
+    if not input_csv_path:
+        raise SystemExit('INPUT_CSV を指定してください')
+    saved = score_reviews_csv(input_csv_path, output_csv_path, model_path)
+    print('Results saved to', saved)
