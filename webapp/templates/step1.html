@@ -1,0 +1,121 @@
+{% extends "base.html" %}
+
+{% block title %}Step 1 - Steamレビュー取得{% endblock %}
+
+{% block content %}
+<div class="step-header">
+    <span class="step-number">1</span>
+    <h1><i class="fas fa-download"></i> Steamレビュー取得</h1>
+    <p class="text-muted">Steamからゲームレビューを取得してCSVファイルを作成します</p>
+</div>
+
+{% with messages = get_flashed_messages() %}
+    {% if messages %}
+        <div class="alert alert-{{ 'danger' if 'エラー' in messages[-1] else 'success' }} alert-dismissible fade show" role="alert">
+            <i class="fas fa-{{ 'exclamation-triangle' if 'エラー' in messages[-1] else 'check-circle' }}"></i>
+            {{ messages[-1] }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    {% endif %}
+{% endwith %}
+
+<form method="post" class="needs-validation" novalidate>
+    <div class="row">
+        <div class="col-md-6">
+            <div class="form-group">
+                <label for="app_id" class="form-label">
+                    <i class="fas fa-gamepad"></i> Steam アプリID
+                </label>
+                <input type="text" class="form-control" id="app_id" name="app_id" 
+                       placeholder="例: 2357570" required>
+                <div class="help-text">
+                    ゲームのSteamストアページのURLから取得できます
+                </div>
+                <div class="invalid-feedback">アプリIDを入力してください</div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="form-group">
+                <label for="output_name" class="form-label">
+                    <i class="fas fa-file-csv"></i> 出力ファイル名
+                </label>
+                <input type="text" class="form-control" id="output_name" name="output_name" 
+                       placeholder="例: my_reviews" required>
+                <div class="help-text">拡張子(.csv)は自動で追加されます</div>
+                <div class="invalid-feedback">ファイル名を入力してください</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-4">
+            <div class="form-group">
+                <label for="review_type" class="form-label">
+                    <i class="fas fa-star"></i> レビュータイプ
+                </label>
+                <select class="form-select" id="review_type" name="review_type">
+                    <option value="all">全てのレビュー</option>
+                    <option value="positive" selected>肯定的なレビュー</option>
+                    <option value="negative">否定的なレビュー</option>
+                </select>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="form-group">
+                <label for="language" class="form-label">
+                    <i class="fas fa-language"></i> 言語
+                </label>
+                <select class="form-select" id="language" name="language">
+                    <option value="all">全ての言語</option>
+                    <option value="japanese" selected>日本語</option>
+                </select>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="form-group">
+                <label for="num_reviews" class="form-label">
+                    <i class="fas fa-list-ol"></i> 取得件数
+                </label>
+                <input type="number" class="form-control" id="num_reviews" name="num_reviews" 
+                       value="100" min="1" max="1000">
+                <div class="help-text">1-1000件まで指定可能</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="text-center">
+        <button type="submit" class="btn btn-primary btn-lg">
+            <i class="fas fa-download"></i> レビューCSVを作成
+        </button>
+    </div>
+</form>
+
+<div class="nav-links">
+    <a href="{{ url_for('step2') }}">
+        <i class="fas fa-arrow-right"></i> Step 2: 評定スコア生成（既存CSV使用）
+    </a>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Bootstrap validation
+(function() {
+    'use strict';
+    window.addEventListener('load', function() {
+        var forms = document.getElementsByClassName('needs-validation');
+        var validation = Array.prototype.filter.call(forms, function(form) {
+            form.addEventListener('submit', function(event) {
+                if (form.checkValidity() === false) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
+                form.classList.add('was-validated');
+            }, false);
+        });
+    }, false);
+})();
+</script>
+{% endblock %}
+
+
