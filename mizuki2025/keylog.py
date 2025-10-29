@@ -30,14 +30,14 @@ class KeyloggerApp:
 
         # ログ表示エリア (ScrolledText)
         self.log_display = scrolledtext.ScrolledText(master, state='disabled', wrap='word', width=90, height=20, font=("Courier", 10))
-        self.log_display.pack(pady=10, padx=10)
+        self.log_display.pack(pady=10, padx=10, fill=tk.BOTH, expand=True)
         
         # ヘッダーを最初に表示
         self.update_display(header=True)
 
         # ボタンフレーム
         button_frame = tk.Frame(master)
-        button_frame.pack(pady=5)
+        button_frame.pack(pady=5, fill=tk.X)
 
         # 開始/停止ボタン
         self.start_stop_button = tk.Button(button_frame, text="ロガー開始", command=self.toggle_keylogger, width=15, bg='lightgreen')

@@ -33,6 +33,7 @@ EMOTIONAL_STATES = [
 ]
 N_STATES = len(EMOTIONAL_STATES)
 N_FEATURES = 5  # 特徴量の次元数
+TIME_WINDOW_SEC = 30.0  # 特徴量抽出の時間窓(秒)
 
 class EmotionAnalyzerApp:
     def __init__(self, master):
@@ -221,7 +222,7 @@ class EmotionAnalyzerApp:
         
         self.data_display.config(state='disabled')
 
-    def extract_features_from_keylog(self, log_data: pd.DataFrame, time_window_sec: float = 2.0) -> Tuple[np.ndarray, np.ndarray]:
+    def extract_features_from_keylog(self, log_data: pd.DataFrame, time_window_sec: float = TIME_WINDOW_SEC) -> Tuple[np.ndarray, np.ndarray]:
         """キーログデータから特徴量を抽出"""
         try:
             # データフレームの準備
@@ -316,8 +317,8 @@ class EmotionAnalyzerApp:
             # 結果を表示
             self.update_emotion_display("=== 感情分析結果 ===\n")
             for i, emotion in enumerate(estimated_emotions):
-                time_start = i * 2
-                time_end = (i + 1) * 2
+                time_start = i * TIME_WINDOW_SEC
+                time_end = (i + 1) * TIME_WINDOW_SEC
                 self.update_emotion_display(f"時間窓 {time_start}-{time_end}秒: {emotion}\n")
                 
             # 統計情報を計算・表示

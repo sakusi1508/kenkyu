@@ -1,10 +1,10 @@
 import pandas as pd
 import numpy as np
 import os
-from typing import Tuple, Dict, Any
+from typing import Tuple, Dict, Any, List
 
 # --- 1. 特徴量抽出関数 (アノテーション用CSV生成に特化) ---
-def create_annotation_ready_features(input_csv_path: str, time_window_sec: float = 2.0) -> pd.DataFrame:
+def create_annotation_ready_features(input_csv_path: str, time_window_sec: float = 30.0) -> pd.DataFrame:
     """
     生のキーログCSVを読み込み、時間窓ごとに特徴量を計算し、
     アノテーションとセッションIDの入力待ち状態のDataFrameを返します。
