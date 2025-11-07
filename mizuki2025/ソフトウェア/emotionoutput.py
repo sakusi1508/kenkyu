@@ -21,8 +21,26 @@ EMO_CSV_FILENAME = "EMOoutput.csv"
 # モデルファイルのパスを設定
 script_dir = os.path.dirname(os.path.abspath(__file__))
 project_root = os.path.dirname(script_dir)
-MODEL_FILENAME = os.path.join(project_root, 'HMMleran', 'hmm_emotion_model_4states.pkl')
-STATES_FILENAME = os.path.join(project_root, 'HMMleran', 'hmm_emotion_model_4states_states.pkl')
+repo_root = os.path.dirname(project_root)
+
+# 優先順で探索するパス候補
+MODEL_PATH_CANDIDATES = [
+    os.path.join(project_root, 'HMMleran', 'hmm_emotion_model_4states.pkl'),
+    os.path.join(repo_root, 'HMMleran', 'hmm_emotion_model_4states.pkl'),
+]
+STATE_PATH_CANDIDATES = [
+    os.path.join(project_root, 'HMMleran', 'hmm_emotion_model_4states_states.pkl'),
+    os.path.join(repo_root, 'HMMleran', 'hmm_emotion_model_4states_states.pkl'),
+]
+
+def _resolve_first_existing(paths: List[str]) -> str:
+    for path in paths:
+        if os.path.exists(path):
+            return path
+    return paths[0]
+
+MODEL_FILENAME = _resolve_first_existing(MODEL_PATH_CANDIDATES)
+STATES_FILENAME = _resolve_first_existing(STATE_PATH_CANDIDATES)
 
 # HMMの隠れ状態（感情ラベル）：4つ
 EMOTIONAL_STATES = [
@@ -397,8 +415,17 @@ class EmotionAnalyzerApp:
                 X, _ = self.extract_features_from_keylog(self.analysis_data)
                 if X.size > 0:
                     estimated_emotions = self.predict_emotion_sequence(X)
-                    # 時間窓ごとの感情を追加
-                    df['推定感情'] = estimated_emotions[:len(df)]
+                    if estimated_emotions:
+                        emotions_per_entry = []
+                        last_index = len(estimated_emotions) - 1
+                        for entry in self.analysis_data:
+                            elapsed = float(entry.get('elapsed_time', 0.0))
+                            window_index = int(elapsed // TIME_WINDOW_SEC)
+                            if window_index > last_index:
+                                window_index = last_index
+                            emotions_per_entry.append(estimated_emotions[window_index])
+                        if len(emotions_per_entry) == len(df):
+                            df['推定感情'] = emotions_per_entry
             
             df.to_csv(filename, index=False, encoding='utf-8')
             messagebox.showinfo("成功", f"分析結果を {filename} に保存しました。")
