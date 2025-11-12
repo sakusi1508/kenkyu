@@ -6,7 +6,7 @@ from tkinter import scrolledtext, filedialog
 from pynput import keyboard
 
 # CSV出力ファイル名 (定数として保持)
-CSV_FILENAME = "keylog_output.csv"
+CSV_FILENAME = "EMOoutput.csv"
 
 # --- Tkinterアプリケーションクラス ---
 class KeyloggerApp:
