@@ -8,7 +8,7 @@ import os
 
 # ゲームタイトルと型のマッピング（merged_game_scores.csvから読み込む）
 def load_game_scores(csv_path: Optional[str] = None) -> pd.DataFrame:
-    """
+    """　
     ゲームスコアCSVを読み込む
     
     Args:
