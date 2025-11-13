@@ -1,8 +1,8 @@
 """
 S.M.A.R.T. ゲームレコメンデーションシステム - GUIアプリケーション
 
-14個の感情ラベルを5個の型に変換し、5個の主観感情との共通印象を比較し、
-キーログから5個の主観感情を推定し、5個の型から最も適合するゲームタイトルをレコメンドする
+14個の感情ラベルを5個の型に変換し、4個の主観感情との共通印象を比較し、
+キーログから4個の主観感情を推定し、5個の型から最も適合するゲームタイトルをレコメンドする
 """
 import tkinter as tk
 from tkinter import ttk, filedialog, messagebox, scrolledtext
@@ -77,7 +77,7 @@ class SmartGameRecommendationGUI:
         
         # 説明
         desc_label = ttk.Label(main_frame, 
-                               text="14個の感情ラベルを5個の型に変換し、キーログから5個の主観感情を推定してゲームをレコメンドします",
+                               text="14個の感情ラベルを5個の型に変換し、キーログから4個の主観感情を推定してゲームをレコメンドします",
                                font=("Helvetica", 10))
         desc_label.grid(row=row, column=0, columnspan=3, pady=5)
         row += 1
@@ -336,8 +336,8 @@ class SmartGameRecommendationGUI:
                 self.result_text.insert(tk.END, f"  {factor}: {value:.3f}\n")
             self.result_text.insert(tk.END, "\n")
         
-        # 5個の主観感情への適合度
-        self.result_text.insert(tk.END, "【5個の主観感情への適合度】\n")
+        # 主観感情への適合度（4個）
+        self.result_text.insert(tk.END, "【4個の主観感情への適合度】\n")
         sorted_emotions = sorted(emotional_similarities.items(), key=lambda x: x[1], reverse=True)
         for emotion, similarity in sorted_emotions:
             self.result_text.insert(tk.END, f"  {emotion}: {similarity:.3f}\n")

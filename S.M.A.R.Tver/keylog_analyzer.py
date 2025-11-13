@@ -1,5 +1,5 @@
 """
-キーログから14因子を推定し、5個の主観感情を推定するモジュール
+キーログから14因子を推定し、4個の主観感情を推定するモジュール
 """
 import pandas as pd
 import numpy as np
@@ -140,7 +140,7 @@ def estimate_emotions_from_keylog(
     time_window_sec: float = 30.0
 ) -> Dict[str, any]:
     """
-    キーログから5個の主観感情を推定
+    キーログから4個の主観感情を推定
     
     Args:
         keylog_path: キーログCSVファイルのパス

@@ -1,11 +1,11 @@
 """
-14個の感情ラベル（14因子）を5個の主観感情と5個の型に変換するモジュール
+14個の感情ラベル（14因子）を4個の主観感情と5個の型に変換するモジュール
 """
 import pandas as pd
 import numpy as np
 from typing import Dict, List, Tuple, Any
 
-# 5つの主観感情ごとの14因子の理想的なパターン
+# 4つの主観感情ごとの14因子の理想的なパターン
 EMOTIONAL_PATTERNS = {
     '設定状況の魅力': {
         'RPG性': 4,
@@ -22,22 +22,6 @@ EMOTIONAL_PATTERNS = {
         'シナリオの重要度': 5,
         '参加人数の多さ': 2,
         'ハードウェア普及度': 4
-    },
-    'ゲーム本来の楽しさ': {
-        'RPG性': 3,
-        'アクション性': 4,
-        'パズル性': 3,
-        '報酬の程度': 5,
-        'グラフィックのリアル性': 3,
-        '音響効果': 3,
-        '世界観の仮想・現実性': 3,
-        'キャラクターの知名度': 4,
-        '文化の異質・同質感': 3,
-        '操作のリアクション': 4,
-        '遂行時間の長さ': 3,
-        'シナリオの重要度': 3,
-        '参加人数の多さ': 3,
-        'ハードウェア普及度': 3
     },
     '感覚運動的興奮': {
         'RPG性': 1,
@@ -130,7 +114,7 @@ FACTOR_LIST = [
     '操作のリアクション', '遂行時間の長さ', 'シナリオの重要度', '参加人数の多さ', 'ハードウェア普及度'
 ]
 
-# 5つの主観感情のリスト
+# 4つの主観感情のリスト
 EMOTIONAL_LABELS = list(EMOTIONAL_PATTERNS.keys())
 
 # 5つのゲームタイプのリスト
@@ -149,13 +133,13 @@ def cosine_similarity(vec1: np.ndarray, vec2: np.ndarray) -> float:
 
 def convert_to_emotional_labels(factor_values: Dict[str, float]) -> Dict[str, float]:
     """
-    14因子の値を5個の主観感情への適合度に変換
+    14因子の値を4個の主観感情への適合度に変換
     
     Args:
         factor_values: 14因子の値を持つ辞書
     
     Returns:
-        5個の主観感情への適合度（類似度）を持つ辞書
+        4個の主観感情への適合度（類似度）を持つ辞書
     """
     # 14因子のベクトルを作成
     user_vec = np.array([factor_values.get(factor, 0.0) for factor in FACTOR_LIST])
@@ -207,10 +191,10 @@ def compare_emotional_and_type_similarity(
     game_type_percentages: Dict[str, float]
 ) -> Dict[str, float]:
     """
-    5個の主観感情と5個の型の共通印象を比較
+    4個の主観感情と5個の型の共通印象を比較
     
     Args:
-        emotional_similarities: 5個の主観感情への類似度
+        emotional_similarities: 4個の主観感情への類似度
         game_type_percentages: 5個の型への適合率
     
     Returns:
@@ -220,9 +204,9 @@ def compare_emotional_and_type_similarity(
     # ここでは、各型がどの主観感情と関連が深いかを定義
     type_emotion_mapping = {
         'C1:ファンタジー型': ['和みと癒し', '難解・頭脳型', '設定状況の魅力'],
-        'C2:映画型': ['設定状況の魅力', 'ゲーム本来の楽しさ'],
-        'C3:現実活動型': ['感覚運動的興奮', 'ゲーム本来の楽しさ'],
-        'C4:キャラクター型': ['和みと癒し', 'ゲーム本来の楽しさ'],
+        'C2:映画型': ['設定状況の魅力'],
+        'C3:現実活動型': ['感覚運動的興奮'],
+        'C4:キャラクター型': ['和みと癒し'],
         'C5:シミュレーション型': ['難解・頭脳型', '和みと癒し']
     }
     
