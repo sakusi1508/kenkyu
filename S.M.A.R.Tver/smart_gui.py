@@ -215,6 +215,10 @@ class SmartGameRecommendationGUI:
             emotional_similarities = None
             game_type_percentages = None
             common_impression_scores = None
+            recommended_games = []
+            emotion_distribution = None
+            emotion_percentages = None
+            dominant_emotion = None
             
             if factor_csv:
                 # 14因子CSVから読み込み
@@ -246,13 +250,18 @@ class SmartGameRecommendationGUI:
                 result = estimate_emotions_from_keylog(
                     keylog_path=keylog,
                     hmm_model_path=hmm_model if hmm_model and os.path.exists(hmm_model) else None,
-                    time_window_sec=self.time_window.get()
+                    time_window_sec=self.time_window.get(),
+                    top_n=self.top_n.get()
                 )
                 
-                factors = result['factors']
-                emotional_similarities = result['emotional_similarities']
-                game_type_percentages = result['game_type_percentages']
-                common_impression_scores = result['common_impression_scores']
+                factors = result.get('factors', {})
+                emotional_similarities = result.get('emotional_similarities', {})
+                game_type_percentages = result.get('game_type_percentages', {})
+                common_impression_scores = result.get('common_impression_scores', {})
+                emotion_distribution = result.get('emotion_distribution')
+                emotion_percentages = result.get('emotion_percentages')
+                dominant_emotion = result.get('dominant_emotion')
+                recommended_games = result.get('recommended_games', [])
             
             else:
                 messagebox.showerror("エラー", 
@@ -283,17 +292,21 @@ class SmartGameRecommendationGUI:
                 messagebox.showerror("エラー", "感情・型の推定に失敗しました。")
                 return
             
-            # ゲームレコメンデーション
-            self.result_text.insert(tk.END, "ゲームをレコメンド中...\n\n")
-            self.root.update()
-            
-            game_scores_path = self.game_scores_path.get().strip() if self.game_scores_path.get().strip() else None
-            recommended_games = recommend_games(
-                game_type_percentages=game_type_percentages,
-                common_impression_scores=common_impression_scores,
-                game_scores_path=game_scores_path,
-                top_n=self.top_n.get()
-            )
+            if not recommended_games:
+                # ゲームレコメンデーション（従来ロジックのフォールバック）
+                self.result_text.insert(tk.END, "ゲームをレコメンド中...\n\n")
+                self.root.update()
+                
+                game_scores_path = self.game_scores_path.get().strip() if self.game_scores_path.get().strip() else None
+                recommended_games = recommend_games(
+                    game_type_percentages=game_type_percentages,
+                    common_impression_scores=common_impression_scores,
+                    game_scores_path=game_scores_path,
+                    top_n=self.top_n.get()
+                )
+            else:
+                self.result_text.insert(tk.END, "HMMモデルに基づくレコメンド結果を使用します。\n\n")
+                self.root.update()
             
             # 結果を表示
             self.display_result(
@@ -301,7 +314,10 @@ class SmartGameRecommendationGUI:
                 emotional_similarities,
                 game_type_percentages,
                 common_impression_scores,
-                recommended_games
+                recommended_games,
+                emotion_distribution=emotion_distribution,
+                emotion_percentages=emotion_percentages,
+                dominant_emotion=dominant_emotion
             )
             
             # 出力ファイルが指定されている場合
@@ -322,11 +338,29 @@ class SmartGameRecommendationGUI:
     
     def display_result(self, factors: Dict, emotional_similarities: Dict, 
                       game_type_percentages: Dict, common_impression_scores: Dict,
-                      recommended_games: List):
+                      recommended_games: List, emotion_distribution: Optional[Dict[str, int]] = None,
+                      emotion_percentages: Optional[Dict[str, float]] = None,
+                      dominant_emotion: Optional[str] = None):
         """結果を表示"""
         self.result_text.insert(tk.END, "="*80 + "\n")
         self.result_text.insert(tk.END, "レコメンデーション結果\n")
         self.result_text.insert(tk.END, "="*80 + "\n\n")
+        
+        if dominant_emotion:
+            self.result_text.insert(tk.END, f"主要感情: {dominant_emotion}\n\n")
+        
+        if emotion_distribution:
+            self.result_text.insert(tk.END, "【感情の出現回数】\n")
+            sorted_distribution = sorted(emotion_distribution.items(), key=lambda x: x[1], reverse=True)
+            for emotion, count in sorted_distribution:
+                percentage = 0.0
+                if emotion_percentages and emotion in emotion_percentages:
+                    percentage = emotion_percentages[emotion] * 100
+                self.result_text.insert(
+                    tk.END,
+                    f"  {emotion}: {count}回" + (f" ({percentage:.2f}%)" if percentage else "") + "\n"
+                )
+            self.result_text.insert(tk.END, "\n")
         
         # 14因子の表示
         if factors:
