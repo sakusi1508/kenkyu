@@ -51,6 +51,8 @@ def calculate_game_type_similarity(game_scores: pd.DataFrame, game_type_percenta
     
     for _, row in game_scores.iterrows():
         game_title = row['game_title']
+        
+        # 14因子を取得
         game_factors = {factor: row.get(factor, 0.0) for factor in FACTOR_LIST}
         game_vec = np.array([game_factors.get(factor, 0.0) for factor in FACTOR_LIST])
         

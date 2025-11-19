@@ -185,6 +185,12 @@ class SmartGameRecommendationGUI:
         
         if file_path:
             var.set(file_path)
+
+    def select_directory(self, var: tk.StringVar, title: str):
+        """ディレクトリ選択ダイアログ"""
+        dir_path = filedialog.askdirectory(title=title)
+        if dir_path:
+            var.set(dir_path)
     
     def clear_all(self):
         """すべての入力と結果をクリア"""
