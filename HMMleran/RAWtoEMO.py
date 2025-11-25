@@ -71,8 +71,6 @@ def create_annotation_ready_features(input_csv_path: str, time_window_sec: float
         
         # 補助情報とプレースホルダーを追加
         segment_data = {
-            'Time_Start_s': round(start_time, 2),
-            'Time_End_s': round(end_time, 2),
             **feature_vector,
             'Session_ID': 'S001_PLACEHOLDER',
             'True_Emotion': 'ENTER_EMOTION_HERE'
@@ -88,17 +86,17 @@ def create_annotation_ready_features(input_csv_path: str, time_window_sec: float
 if __name__ == '__main__':
     
     # 入力ファイルパス: ご提示のキーログファイル
-    INPUT_CSV_PATH = 'keydata/keylog_output.csv'
+    INPUT_CSV_PATH = 'HMMleran/DB/kiyoya.csv'
     # 出力ファイルパス: アノテーションを入力するためのCSV
-    OUTPUT_CSV_PATH = 'HMMleran/features_ready_for_annotation.csv'
+    OUTPUT_CSV_PATH = 'HMMleran/kiyotaANOTEr.csv'
     
     # 実行
     df_output = create_annotation_ready_features(INPUT_CSV_PATH)
     
     if not df_output.empty:
         # 補助的なカラムを先頭に移動し、手動入力しやすい形式にする
-        cols = ['Session_ID', 'True_Emotion', 'Time_Start_s', 'Time_End_s'] + \
-               [col for col in df_output.columns if col not in ['Session_ID', 'True_Emotion', 'Time_Start_s', 'Time_End_s']]
+        cols = ['Session_ID', 'True_Emotion'] + \
+               [col for col in df_output.columns if col not in ['Session_ID', 'True_Emotion']]
         df_output = df_output[cols]
         
         df_output.to_csv(OUTPUT_CSV_PATH, index=False)

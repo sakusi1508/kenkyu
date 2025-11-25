@@ -22,8 +22,14 @@ except ImportError:
 # ローカルモジュールをインポート
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from emotion_converter import (
-    FACTOR_LIST, convert_to_emotional_labels, convert_to_game_types,
+    FACTOR_LIST, EMOTIONAL_PATTERNS, convert_to_emotional_labels, convert_to_game_types,
     compare_emotional_and_type_similarity
+)
+from DB.recommendation_system import (
+    recommend_games as recommend_games_from_emotions,
+    analyze_emotion_distribution,
+    load_emotion_game_mapping,
+    HMM_EMOTIONAL_STATES
 )
 
 
@@ -137,15 +143,17 @@ def estimate_factors_from_keylog_features(features: np.ndarray) -> Dict[str, flo
 def estimate_emotions_from_keylog(
     keylog_path: str,
     hmm_model_path: Optional[str] = None,
-    time_window_sec: float = 30.0
+    time_window_sec: float = 30.0,
+    top_n: int = 5
 ) -> Dict[str, any]:
     """
-    キーログから4個の主観感情を推定
+    キーログから4個の主観感情を推定し、学習済みHMMモデルに基づくレコメンド結果を返します。
     
     Args:
         keylog_path: キーログCSVファイルのパス
         hmm_model_path: HMMモデルファイルのパス（オプション）
         time_window_sec: 時間窓のサイズ（秒）
+        top_n: レコメンドするゲーム数
     
     Returns:
         推定結果を含む辞書
@@ -173,13 +181,72 @@ def estimate_emotions_from_keylog(
             logprob, state_sequence = model.decode(X, algorithm="viterbi")
             estimated_emotions = [state_names[state] for state in state_sequence]
             
-            # 最も多い感情を取得
-            from collections import Counter
-            emotion_counter = Counter(estimated_emotions)
-            dominant_emotion = emotion_counter.most_common(1)[0][0]
+            # HMM出力に基づく感情分布と主要感情
+            emotion_distribution = analyze_emotion_distribution(estimated_emotions)
+            total_emotions = sum(emotion_distribution.values())
+            emotion_percentages = {}
+            if total_emotions > 0:
+                emotion_percentages = {
+                    emotion: count / total_emotions
+                    for emotion, count in emotion_distribution.items()
+                }
+            dominant_emotion = max(
+                emotion_distribution, key=emotion_distribution.get
+            ) if emotion_distribution else None
             
-            # 14因子を推定（簡易的な方法）
-            factors = estimate_factors_from_keylog_features(X)
+            # HMMの出力を利用したレコメンデーション
+            hmm_dominant, recommended_titles, _ = recommend_games_from_emotions(
+                estimated_emotions,
+                top_n=top_n
+            )
+            dominant_emotion = dominant_emotion or hmm_dominant
+            
+            mapping_df = load_emotion_game_mapping()
+            recommended_games = []
+            for title in recommended_titles:
+                score_rows = mapping_df[
+                    (mapping_df['game_title'] == title) &
+                    (mapping_df['emotion_label'] == dominant_emotion)
+                ]
+                similarity_score = float(score_rows.iloc[0]['similarity_score']) if not score_rows.empty else 0.0
+                recommended_games.append((title, similarity_score))
+            
+            # 感情割合に基づく14因子推定（学習モデル出力を反映）
+            if emotion_percentages:
+                factors = {factor: 0.0 for factor in FACTOR_LIST}
+                for emotion, weight in emotion_percentages.items():
+                    pattern = EMOTIONAL_PATTERNS.get(emotion, {})
+                    for factor, value in pattern.items():
+                        factors[factor] += value * weight
+            else:
+                factors = {factor: 0.0 for factor in FACTOR_LIST}
+            
+            # 4個の主観感情への適合度をHMMの割合として設定
+            emotional_similarities = {
+                emotion: emotion_percentages.get(emotion, 0.0)
+                for emotion in HMM_EMOTIONAL_STATES
+            }
+            
+            # 14因子から5個の型への変換（学習モデル由来の因子を使用）
+            game_type_percentages = convert_to_game_types(factors)
+            
+            # 共通印象の比較
+            common_impression_scores = compare_emotional_and_type_similarity(
+                emotional_similarities,
+                game_type_percentages
+            )
+            
+            return {
+                'factors': factors,
+                'emotional_similarities': emotional_similarities,
+                'game_type_percentages': game_type_percentages,
+                'common_impression_scores': common_impression_scores,
+                'dominant_emotion': dominant_emotion,
+                'estimated_emotions': estimated_emotions,
+                'emotion_distribution': emotion_distribution,
+                'emotion_percentages': emotion_percentages,
+                'recommended_games': recommended_games
+            }
             
         except Exception as e:
             print(f"HMMモデルの読み込みに失敗しました: {e}")
