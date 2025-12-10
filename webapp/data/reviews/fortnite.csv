@@ -1,0 +1,33 @@
+recommendationid,author,language,review,timestamp_created,timestamp_updated,voted_up,votes_up,votes_funny,weighted_vote_score,comment_count,steam_purchase,received_for_free,written_during_early_access,primarily_steam_deck
+31545116,"{'steamid': '76561198101322982', 'num_games_owned': 0, 'num_reviews': 4, 'playtime_forever': 2451, 'playtime_last_two_weeks': 0, 'playtime_at_review': 1389, 'last_played': 1494862333}",japanese,"似たものにAir Mission HINDがありますが、こちらの操作のほうが平行移動(カニ歩き)もできていいです。
+XBOXコントローラーは使えないです(joystickはありました)
+15年前のゲームなのでグラはきついです。
+
+フォーラムにも書いてますがWin10+gtx980tiで動きました。
+仮想XPがどうのとかいろいろ書いてますが、コメントにある""DirectPlay""を入れるだけでOKでした。
+コントロールパネル  →  プログラムと機能  → win機能の有効無効 → レガシーコンポーネントの中のDirectPlayにチェック これだけです。(Thank you ShadowGeckoX)",1493920124,1493920124,True,7,0,0.625824332237243652,0,True,False,False,False
+47805449,"{'steamid': '76561198162218101', 'num_games_owned': 0, 'num_reviews': 7, 'playtime_forever': 1276, 'playtime_last_two_weeks': 0, 'playtime_at_review': 981, 'last_played': 1703768680}",japanese,"古いゲームながら、ヘリコプターを自在に飛行させ、各種武装で戦う爽快感は健在。
+武装は20mm機銃、AGM-114「ヘルファイア」、FIM-92「スティンガー」、70mmロケット弾「ハイドラ」があり、性能にもそれぞれ長短ある。
+
+ヘルファイア：威力大。ただし誘導は1発ずつしか行えない上に弾速が遅い。その上命中するまでロックオンは継続せねばならず、敵の攻撃が激しくなる後半では使いにくくなる。ただし撃って楽しいのはこっち。
+スティンガー：威力小。ロックオンは発射したら外してもいい。弾速も早く、超誘導によりほぼ必ず命中する。戦車も2発当てれば倒せるので、後半はヘルファイアではなくこちら主力で。
+ハイドラ：威力大。全く誘導しないが、ロックオンして発射すれば機体側で調整してくれるので、相手が停まってさえいれば命中する。
+20mm機銃：威力は小さいが、弾数は多いのでドンドン撃っていこう。
+
+ダメージは受けやすいが、そんな時は味方の着陸場に引き返して修理・補給しよう。たとえ時間がかかってもペナルティは無いのでじっくり攻略すると良い。最寄りの着陸場の方角はレーダー上黄色のアイコンで表示される。着陸した状態でF8を押すと武装を変更でき、ここから好きな武器を配分して持っていくといい。
+
+問題点１：回避用にフレアも装備しているが、敵のミサイルも超誘導のため、ほぼ役立たずである。
+問題点２：スタブウィングは実機同様に投棄も可能だが、イマイチ意義がわからない。もしかしたらロックオンされにくくなるのかも？",1545743772,1562857153,True,2,0,0.544468522071838379,0,True,False,False,False
+40901569,"{'steamid': '76561198108821543', 'num_games_owned': 177, 'num_reviews': 47, 'playtime_forever': 45, 'playtime_last_two_weeks': 0, 'playtime_at_review': 45, 'last_played': 1521385422}",japanese,"良い点：
+シンプルな操作性で爽快感のあるミッションが楽しめる。
+ゲームバランスが良いのでストレスが無い。
+Windows 10で動作可能。
+
+悪い点：
+古いのでグラフィックが簡素。
+
+総合評価：
+目標をロックして撃つという繰り返しですが、三次元的に動く必要があるので最初はとっつきにくいかもしれません。
+しかし、自在に動かせるようになってからが本番です。
+一人で膨大な敵を相手に撃ちまくる爽快感をお楽しみください。",1521388764,1521388764,True,1,0,0.523809552192687988,0,True,False,False,False
+10662083,"{'steamid': '76561198014327985', 'num_games_owned': 0, 'num_reviews': 2, 'playtime_forever': 65, 'playtime_last_two_weeks': 0, 'playtime_at_review': 65, 'last_played': 1403790239}",japanese,戦車も飛行機もいいけど攻撃ヘリもね！っていうゲーム。昔のゲームだから古いパソコンでもさくっと動いてありがたい。,1403440109,1403440109,True,6,0,0.613050401210784912,0,True,False,False,False
