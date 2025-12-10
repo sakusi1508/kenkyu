@@ -1,0 +1,5 @@
+recommendationid,author,language,review,timestamp_created,timestamp_updated,voted_up,votes_up,votes_funny,weighted_vote_score,comment_count,steam_purchase,received_for_free,written_during_early_access,primarily_steam_deck
+144900916,"{'steamid': '76561198290736276', 'num_games_owned': 0, 'num_reviews': 239, 'playtime_forever': 1370, 'playtime_last_two_weeks': 0, 'playtime_at_review': 1370, 'last_played': 1725224518}",japanese,"オーバーウォッチ最高！！！
+
+世界はヒーローを求めている",1692856087,1744972713,True,0,0,0.476190477609634399,0,True,False,False,False
+162961882,"{'steamid': '76561199547514015', 'num_games_owned': 0, 'num_reviews': 1, 'playtime_forever': 112011, 'playtime_last_two_weeks': 618, 'playtime_at_review': 4819, 'last_played': 1764744101}",japanese,神ゲー,1713232058,1713232058,True,2,0,0.450792223215103149,0,True,True,False,False

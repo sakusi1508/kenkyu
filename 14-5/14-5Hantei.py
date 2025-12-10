@@ -136,7 +136,7 @@ def estimate_game_type_percentages(input_csv_path: str, output_csv_path: str):
 # 【利用方法】以下のパスをあなたのCSVファイルのパスに置き換えて、プログラムを実行してください。
 
 # ★★★ ここを実際のCSVファイルパスに変更 ★★★
-input_csv_path = '/Users/sakumasin/Documents/vscode/zemi/score/supura_scores_japanese.csv' # 添付されたファイル名
-output_csv_path = '/Users/sakumasin/code/kenkyu/14-5/result/supu14-5.csv' # 出力ファイル名
+input_csv_path = '/Users/sakumasin/Documents/GitHub/kenkyu/webapp/data/scores/cyberscore.csv' # 添付されたファイル名
+output_csv_path = '/Users/sakumasin/code/kenkyu/14-5/result/cyber14-5.csv' # 出力ファイル名
 
 estimate_game_type_percentages(input_csv_path, output_csv_path)
